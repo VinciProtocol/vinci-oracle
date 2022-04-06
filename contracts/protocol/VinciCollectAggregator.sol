@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/SimpleReadAccessController.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV2V3Interface.sol";
 
-contract CollectAggregator is AggregatorV2V3Interface {
+contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessController {
     struct Round {
       int256 answer;
       uint64 startedAt;
@@ -53,10 +53,31 @@ contract CollectAggregator is AggregatorV2V3Interface {
       rounds[0].updatedAt = uint64(block.timestamp - (uint256(_timeout)));
     }
 
+    modifier onlyOperator() {
+      require(operator() == msg.sender, "caller is not the operator");
+      _;
+    }
+
+    /**
+     * @dev Returns the address of the current operator.
+     */
+    function operator() public view virtual returns (address) {
+        return _operator;
+    }
+
+    /**
+     * @dev Transfers operational ownership of the contract to a new account (`newOperator`).
+     * Can only be called by the current owner.
+     */
+    function transferOperationalOwnership(address newOperator) public onlyOwner {
+        require(newOperator != address(0), "new operator is the zero address");
+        _operator = newOperator;
+    }
+
     /**
       * Receive the response in the form of uint256
       */ 
-    function submit(int256 _data) public
+    function submit(int256 _data) public onlyOperator
     {
       require(_data >= minSubmissionValue, "value below minSubmissionValue");
       require(_data <= maxSubmissionValue, "value above maxSubmissionValue");
@@ -264,7 +285,7 @@ contract CollectAggregator is AggregatorV2V3Interface {
 }
 
 
-contract VinciCollectAggregator is CollectAggregator, SimpleReadAccessController {
+contract VinciCollectAggregator is CollectAggregator {
     /**
     * @notice set up the aggregator with initial configuration
     * @param _timeout is the number of seconds after the previous round that are

@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.0;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
+
+import {Ownable} from '../dependencies/openzeppelin/contracts/Ownable.sol';
 import "./VinciCollectAggregator.sol";
 
 /**
@@ -14,7 +16,7 @@ import "./VinciCollectAggregator.sol";
  * THIS IS AN EXAMPLE CONTRACT WHICH USES HARDCODED VALUES FOR CLARITY.
  * PLEASE DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract VinciChainlinkClient is ChainlinkClient {
+contract VinciChainlinkClient is ChainlinkClient, Ownable {
     using Chainlink for Chainlink.Request;
 
     struct Node {
@@ -78,7 +80,7 @@ contract VinciChainlinkClient is ChainlinkClient {
         uint256 _fee,
         string memory _url,
         string memory _path
-        ) public {
+        ) public onlyOwner {
         nodes[_aggregator].oracle = _oracle;
         nodes[_aggregator].jobId = _jobId;
         nodes[_aggregator].fee = _fee;
