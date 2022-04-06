@@ -45,7 +45,7 @@ contract VinciChainlinkClient is ChainlinkClient, Ownable {
      * Create a Chainlink request to retrieve API response, find the target
      * data, then multiply by 1000000000000000000 (to remove decimal places from data).
      */
-    function requestVolumeData(address _aggregator) public returns (bytes32 requestId) 
+    function requestVolumeData(address _aggregator) public onlyOwner returns (bytes32 requestId) 
     {
         require(nodes[_aggregator].oracle != address(0x0), "please update nodes");
         Chainlink.Request memory request = buildChainlinkRequest(nodes[_aggregator].jobId, address(this), this.fulfill.selector);
