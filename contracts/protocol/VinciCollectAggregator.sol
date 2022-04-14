@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/SimpleReadAccessController.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV2V3Interface.sol";
+import {SignedSafeMath} from '../dependencies/openzeppelin/contracts/utils/math/SignedSafeMath.sol';
 
 contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessController {
     struct Round {
@@ -12,6 +13,7 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
     }
 
     uint32 internal latestRoundId;
+    uint32 internal startRoundId = 1;
     mapping(uint32 => Round) internal rounds;
 
     uint8 public override decimals;
@@ -27,6 +29,8 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
     // confusion around accidentally reading unset values as reported values.
     string constant private V3_NO_DATA_ERROR = "No data present";
     address private _operator;
+    
+    int256 priceCumulative;
 
     /**
     * @notice set up the aggregator with initial configuration
@@ -74,6 +78,21 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
         _operator = newOperator;
     }
 
+    function computeAmountOut(int256 _price, uint64 _startedAt) private view returns (int256 amountOut, int256 priceCumulativeOut) {
+      if (latestRoundId == uint32(0)) {
+        return (_price, 0);
+      }
+      int256 timeElapsed1 = int256(uint256(_startedAt - rounds[latestRoundId].startedAt));
+      int256 timeElapsed2 = int256(uint256(_startedAt - rounds[startRoundId].startedAt));
+      int256 currentPriceCumulative = SignedSafeMath.mul(_price, timeElapsed1);
+      priceCumulativeOut = SignedSafeMath.add(currentPriceCumulative, priceCumulative);
+      amountOut = SignedSafeMath.div(priceCumulativeOut, timeElapsed2);
+    }
+
+    function getPriceCumulative() public view returns (int256 price) {
+      return priceCumulative;
+    }
+
     /**
       * Receive the response in the form of uint256
       */ 
@@ -82,7 +101,9 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
       require(_data >= minSubmissionValue, "value below minSubmissionValue");
       require(_data <= maxSubmissionValue, "value above maxSubmissionValue");
 
-      updateRoundAnswer(latestRoundId + 1, _data);
+      uint64 startedAt = uint64(block.timestamp);
+      (_data, priceCumulative) = computeAmountOut(_data, startedAt);
+      updateRoundAnswer(latestRoundId + 1, startedAt, _data);
     }
 
     /**
@@ -264,10 +285,11 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
       return getRoundData(latestRoundId);
     }
 
-    function updateRoundAnswer(uint32 _roundId, int256 _newAnswer)
+    function updateRoundAnswer(uint32 _roundId, uint64 _startedAt, int256 _newAnswer)
       internal
     {
       rounds[_roundId].answer = _newAnswer;
+      rounds[_roundId].startedAt = _startedAt;
       rounds[_roundId].updatedAt = uint64(block.timestamp);
       rounds[_roundId].answeredInRound = _roundId;
       latestRoundId = _roundId;
