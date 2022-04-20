@@ -5,7 +5,7 @@ import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 
 import {Ownable} from '../dependencies/openzeppelin/contracts/Ownable.sol';
-import "./VinciCollectAggregator.sol";
+import "./VinciCollectPriceCumulative.sol";
 
 /**
  * Request testnet LINK and ETH here: https://faucets.chain.link/
@@ -28,7 +28,7 @@ contract VinciChainlinkClient is ChainlinkClient, Ownable {
     }
     
     mapping(address => Node) internal nodes;
-    mapping(bytes32 => address) private b_aggregators;
+    mapping(bytes32 => address) private collectors;
 
     /**
      * Network: Kovan
@@ -45,22 +45,22 @@ contract VinciChainlinkClient is ChainlinkClient, Ownable {
      * Create a Chainlink request to retrieve API response, find the target
      * data, then multiply by 1000000000000000000 (to remove decimal places from data).
      */
-    function requestVolumeData(address _aggregator) public onlyOwner returns (bytes32 requestId) 
+    function requestVolumeData(address _collector) public onlyOwner returns (bytes32 requestId) 
     {
-        require(nodes[_aggregator].oracle != address(0x0), "please update nodes");
-        Chainlink.Request memory request = buildChainlinkRequest(nodes[_aggregator].jobId, address(this), this.fulfill.selector);
+        require(nodes[_collector].oracle != address(0x0), "please update nodes");
+        Chainlink.Request memory request = buildChainlinkRequest(nodes[_collector].jobId, address(this), this.fulfill.selector);
         
         // Set the URL to perform the GET request on
-        request.add("get", nodes[_aggregator].url);
-        request.add("path", nodes[_aggregator].path);
+        request.add("get", nodes[_collector].url);
+        request.add("path", nodes[_collector].path);
         
         // Multiply the result by 1000000000000000000 to remove decimals
         int timesAmount = 10**18;
         request.addInt("times", timesAmount);
         
         // Sends the request
-        bytes32 Id = sendChainlinkRequestTo(nodes[_aggregator].oracle, request, nodes[_aggregator].fee);
-        b_aggregators[Id] = _aggregator;
+        bytes32 Id = sendChainlinkRequestTo(nodes[_collector].oracle, request, nodes[_collector].fee);
+        collectors[Id] = _collector;
         return Id;
     }
     
@@ -69,26 +69,26 @@ contract VinciChainlinkClient is ChainlinkClient, Ownable {
      */ 
     function fulfill(bytes32 _requestId, int256 _data) public recordChainlinkFulfillment(_requestId)
     {
-        VinciCollectAggregator(b_aggregators[_requestId]).submit(_data);
-        delete b_aggregators[_requestId];
+        VinciCollectPriceCumulative(collectors[_requestId]).updatePriceCumulative(_data);
+        delete collectors[_requestId];
     }
 
     function setNode(
-        address _aggregator,
+        address _collector,
         address _oracle,
         bytes32 _jobId,
         uint256 _fee,
         string memory _url,
         string memory _path
         ) public onlyOwner {
-        nodes[_aggregator].oracle = _oracle;
-        nodes[_aggregator].jobId = _jobId;
-        nodes[_aggregator].fee = _fee;
-        nodes[_aggregator].url = _url;
-        nodes[_aggregator].path = _path;
+        nodes[_collector].oracle = _oracle;
+        nodes[_collector].jobId = _jobId;
+        nodes[_collector].fee = _fee;
+        nodes[_collector].url = _url;
+        nodes[_collector].path = _path;
     }
 
-    function getNode(address _aggregator) public view
+    function getNode(address _collector) public view
         returns (
         address oracle,
         bytes32 jobId,
@@ -97,7 +97,7 @@ contract VinciChainlinkClient is ChainlinkClient, Ownable {
         string memory path
         )
     {
-        Node memory n = nodes[_aggregator];
+        Node memory n = nodes[_collector];
         return (
         n.oracle,
         n.jobId,
