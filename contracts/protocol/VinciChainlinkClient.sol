@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/LinkTokenInterface.sol";
 
-import {Ownable} from '../dependencies/openzeppelin/contracts/Ownable.sol';
+import {Operatable} from './Operatable.sol';
 import "./VinciCollectPriceCumulative.sol";
 
 /**
@@ -16,7 +16,7 @@ import "./VinciCollectPriceCumulative.sol";
  * THIS IS AN EXAMPLE CONTRACT WHICH USES HARDCODED VALUES FOR CLARITY.
  * PLEASE DO NOT USE THIS CODE IN PRODUCTION.
  */
-contract VinciChainlinkClient is ChainlinkClient, Ownable {
+contract VinciChainlinkClient is ChainlinkClient, Operatable {
     using Chainlink for Chainlink.Request;
 
     struct Node {
@@ -45,7 +45,7 @@ contract VinciChainlinkClient is ChainlinkClient, Ownable {
      * Create a Chainlink request to retrieve API response, find the target
      * data, then multiply by 1000000000000000000 (to remove decimal places from data).
      */
-    function requestVolumeData(address _collector) public onlyOwner returns (bytes32 requestId) 
+    function requestVolumeData(address _collector) public onlyOperator returns (bytes32 requestId) 
     {
         require(nodes[_collector].oracle != address(0x0), "please update nodes");
         Chainlink.Request memory request = buildChainlinkRequest(nodes[_collector].jobId, address(this), this.fulfill.selector);

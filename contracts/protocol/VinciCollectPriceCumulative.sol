@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 import {SignedSafeMath} from '../dependencies/openzeppelin/contracts/utils/math/SignedSafeMath.sol';
 import {SafeMath} from '../dependencies/openzeppelin/contracts/utils/math/SafeMath.sol';
-import {Ownable} from '../dependencies/openzeppelin/contracts/Ownable.sol';
+import {Operatable} from './Operatable.sol';
 import {CollectInterface} from '../interface/CollectInterface.sol';
 
-contract VinciCollectPriceCumulative is CollectInterface, Ownable {
+contract VinciCollectPriceCumulative is CollectInterface, Operatable {
     
     int256 priceCumulative;
     uint64 latestUpdatedAt;
@@ -42,27 +42,6 @@ contract VinciCollectPriceCumulative is CollectInterface, Ownable {
       decimals = _decimals;
       description = _description;
       latestUpdatedAt = uint64(block.timestamp - (uint256(_timeout)));
-    }
-
-    modifier onlyOperator() {
-      require(operator() == msg.sender, "caller is not the operator");
-      _;
-    }
-
-    /**
-     * @dev Returns the address of the current operator.
-     */
-    function operator() public view returns (address) {
-        return _operator;
-    }
-
-    /**
-     * @dev Transfers operational ownership of the contract to a new account (`newOperator`).
-     * Can only be called by the current owner.
-     */
-    function transferOperationalOwnership(address newOperator) public onlyOwner {
-        require(newOperator != address(0), "new operator is the zero address");
-        _operator = newOperator;
     }
 
     function computeAmountOut(int256 _price, uint64 _startedAt) internal view returns (int256 priceCumulativeOut) {

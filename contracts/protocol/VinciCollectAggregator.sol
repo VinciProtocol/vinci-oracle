@@ -64,27 +64,6 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
       rounds[0].updatedAt = uint64(block.timestamp - (uint256(_timeout)));
     }
 
-    modifier onlyOperator() {
-      require(operator() == msg.sender, "caller is not the operator");
-      _;
-    }
-
-    /**
-     * @dev Returns the address of the current operator.
-     */
-    function operator() public view virtual returns (address) {
-        return _operator;
-    }
-
-    /**
-     * @dev Transfers operational ownership of the contract to a new account (`newOperator`).
-     * Can only be called by the current owner.
-     */
-    function transferOperationalOwnership(address newOperator) public onlyOwner {
-        require(newOperator != address(0), "new operator is the zero address");
-        _operator = newOperator;
-    }
-
     function computeAmountOut() private view returns (int256 amountOut, int256 currentPriceCumulative, uint64 currentTime) {
       require(_collector != address(0), "Please set the collector first");
 
@@ -97,7 +76,7 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
     /**
       * Receive the response in the form of uint256
       */ 
-    function submit(int256 _data) public onlyOperator
+    function submit(int256 _data) public onlyOwner
     {
       require(_data >= minSubmissionValue, "value below minSubmissionValue");
       require(_data <= maxSubmissionValue, "value above maxSubmissionValue");
@@ -106,7 +85,7 @@ contract CollectAggregator is AggregatorV2V3Interface, SimpleReadAccessControlle
       updateRoundAnswer(latestRoundId + 1, startedAt, _data);
     }
 
-    function submitWithTWAP() public onlyOperator
+    function submitWithTWAP() public
     {
       int256 data;
       (data, priceCumulative, latestTimeAt)= computeAmountOut();
