@@ -20,15 +20,19 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
     using Chainlink for Chainlink.Request;
 
     struct Node {
+        uint8 nodeId;
         address oracle;
         bytes32 jobId;
         uint256 fee;
         string url;
         string path;
     }
+    uint8 internal nodeIndex = 0;
     
     mapping(address => Node) internal nodes;
     mapping(bytes32 => address) private collectors;
+
+    event VinciChainlinkFulfilled(uint8 indexed id, uint64 time, int256 _data);
 
     /**
      * Network: Kovan
@@ -66,11 +70,13 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
     
     /**
      * Receive the response in the form of uint256
-     */ 
+     */
     function fulfill(bytes32 _requestId, int256 _data) public recordChainlinkFulfillment(_requestId)
     {
-        VinciCollectPriceCumulative(collectors[_requestId]).updatePriceCumulative(_data);
+        address collector = collectors[_requestId];
+        VinciCollectPriceCumulative(collector).updatePriceCumulative(_data);
         delete collectors[_requestId];
+        emit VinciChainlinkFulfilled(nodes[collector].nodeId, uint64(block.timestamp), _data);
     }
 
     function setNode(
@@ -81,6 +87,8 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
         string memory _url,
         string memory _path
         ) public onlyOwner {
+        nodeIndex = nodeIndex + 1;
+        nodes[_collector].nodeId = nodeIndex;
         nodes[_collector].oracle = _oracle;
         nodes[_collector].jobId = _jobId;
         nodes[_collector].fee = _fee;
@@ -90,6 +98,7 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
 
     function getNode(address _collector) public view
         returns (
+        uint8 nodeId,
         address oracle,
         bytes32 jobId,
         uint256 fee,
@@ -99,6 +108,7 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
     {
         Node memory n = nodes[_collector];
         return (
+        n.nodeId,
         n.oracle,
         n.jobId,
         n.fee,
