@@ -87,8 +87,10 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
         string memory _url,
         string memory _path
         ) public onlyOwner {
-        nodeIndex = nodeIndex + 1;
-        nodes[_collector].nodeId = nodeIndex;
+        if (nodes[_collector].nodeId == 0) {
+          nodeIndex = nodeIndex + 1;
+          nodes[_collector].nodeId = nodeIndex;
+        }
         nodes[_collector].oracle = _oracle;
         nodes[_collector].jobId = _jobId;
         nodes[_collector].fee = _fee;
