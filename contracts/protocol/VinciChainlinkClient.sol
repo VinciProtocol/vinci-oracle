@@ -121,4 +121,9 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
        LinkTokenInterface link = LinkTokenInterface(chainlinkTokenAddress());
        return link.balanceOf(address(this));
    }
+
+   function withdrawAllLink() public onlyOwner {
+       uint256 amount = LinkBalanceOf();
+       LinkTokenInterface(chainlinkTokenAddress()).transfer(msg.sender, amount);
+   }
 }
