@@ -24,7 +24,7 @@ async function main() {
 
   // 2.1 deploy VinciChainlinkClient:
   const VinciChainlinkClient = await hre.ethers.getContractFactory("VinciChainlinkClient");
-  const vinciChainlinkClient = await VinciChainlinkClient.deploy();
+  const vinciChainlinkClient = await VinciChainlinkClient.deploy(process.env.LINK_ADDRESS);
   await vinciChainlinkClient.deployed();
   console.log(" ++ VinciChainlinkClient deployed to:", vinciChainlinkClient.address);
 

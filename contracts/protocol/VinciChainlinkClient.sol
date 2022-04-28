@@ -41,8 +41,8 @@ contract VinciChainlinkClient is ChainlinkClient, Operatable {
      * Job ID: d5270d1c311941d0b08bead21fea7747
      * Fee: 0.1 LINK 0.1 * 10 ** 18
      */
-    constructor() {
-        setPublicChainlinkToken();
+    constructor(address _link) {
+        setChainlinkToken(_link);
     }
     
     /**
