@@ -4,6 +4,13 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
+const {
+  getVinciCollectPriceCumulative,
+} = require("./helpers/contracts-getters.js");
+
+const {
+  deploy_VinciCollectAggregator,
+} = require("./helpers/contracts-helpers.js")
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -13,13 +20,9 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  // We get the contract to deplo
-  const VinciCollectAggregator = await hre.ethers.getContractFactory("VinciCollectAggregator");
-  const vinciCollectAggregator = await VinciCollectAggregator.deploy(0, 0, BigInt('99999999999999999999999999999999'), 18, "Pancake Squad floor price");
-  await vinciCollectAggregator.deployed();
-  await vinciCollectAggregator.disableAccessCheck();
-  
-  console.log("VinciCollectAggregator deployed to:", vinciCollectAggregator.address);
+  // We get the contract to deploy
+  const vinciCollectPriceCumulative = await getVinciCollectPriceCumulative();
+  await deploy_VinciCollectAggregator(vinciCollectPriceCumulative);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
