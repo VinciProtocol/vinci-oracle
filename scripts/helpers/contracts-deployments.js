@@ -1,4 +1,7 @@
 const hre = require("hardhat");
+const {
+  verifyContract,
+} = require("./etherscan-verification.js");
 require('dotenv').config();
 
 async function deployContract(name, ...args) {
@@ -7,6 +10,12 @@ async function deployContract(name, ...args) {
   const contract = await Contract.deploy(...args);
   await contract.deployed();
   console.log(" ++ " + name + " deployed to:", contract.address);
+
+  const verify = process.env.VERIFY || false;
+  console.log("verify", verify);
+  if (verify) {
+    verifyContract(contract.address, ...args);
+  }
   return contract;
 }
 

@@ -4,7 +4,6 @@
 // When running the script with `npx hardhat run <script>` you'll find the Hardhat
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
-require('dotenv').config();
 
 const {
   deploy_VinciCollectPriceCumulative,

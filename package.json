@@ -24,6 +24,7 @@
     "dotenv": "^16.0.0",
     "ethereum-waffle": "^3.4.4",
     "ethers": "^5.6.2",
-    "hardhat": "^2.9.2"
+    "hardhat": "^2.9.2",
+    "temp-hardhat-etherscan": "^2.0.2"
   }
 }

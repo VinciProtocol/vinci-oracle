@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("temp-hardhat-etherscan");
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -14,10 +15,11 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 
 const DEFAULT_NETWORK = "hardhat";
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY;
-const KOVAN_PRIVATE_KEY = process.env.KOVAN_PRIVATE_KEY;
-const BSCTEST_PRIVATE_KEY = process.env.BSCTEST_PRIVATE_KEY;
-const BSCMAIN_PRIVATE_KEY = process.env.BSCMAIN_PRIVATE_KEY;
+const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || "";
+const KOVAN_PRIVATE_KEY = process.env.KOVAN_PRIVATE_KEY || "";
+const BSCTEST_PRIVATE_KEY = process.env.BSCTEST_PRIVATE_KEY || "";
+const BSCMAIN_PRIVATE_KEY = process.env.BSCMAIN_PRIVATE_KEY || "";
+const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || "";
 
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
@@ -69,5 +71,8 @@ module.exports = {
       chainId: 56,
       accounts: [`${BSCMAIN_PRIVATE_KEY}`]
     }
+  },
+  etherscan: {
+    apiKey: `${ETHERSCAN_KEY}`
   }
 };
