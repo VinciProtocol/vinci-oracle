@@ -1,6 +1,7 @@
 const {
     Context
 } = require('./context');
+const Web3Utils = require('web3-utils');
 
 
 async function main() {
@@ -21,7 +22,7 @@ async function main() {
         await client.setNode(
             vinciCollectPriceCumulative.address,
             process.env.ORACLE_ADDRESS,
-            process.env.JOBID,
+            Web3Utils.asciiToHex(process.env.JOBID),
             BigInt(process.env.FEE * 10 ** 18),
             process.env.REQUEST_URL,
             process.env.REQUEST_PATH,
