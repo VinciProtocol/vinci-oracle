@@ -1,5 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
-require("temp-hardhat-etherscan");
+require("@nomiclabs/hardhat-etherscan");
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -15,7 +15,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 
 const DEFAULT_NETWORK = "hardhat";
-const ALCHEMY_API_KEY = process.env.ALCHEMY_API_KEY || "";
 const KOVAN_PRIVATE_KEY = process.env.KOVAN_PRIVATE_KEY || "";
 const BSCTEST_PRIVATE_KEY = process.env.BSCTEST_PRIVATE_KEY || "";
 const BSCMAIN_PRIVATE_KEY = process.env.BSCMAIN_PRIVATE_KEY || "";
@@ -41,7 +40,7 @@ module.exports = {
   mocha: {
     timeout: 20000,
   },
-  defaultNetwork: `${DEFAULT_NETWORK}`,
+  defaultNetwork: DEFAULT_NETWORK,
   networks: {
     localhost: {
       accounts: 'remote',
@@ -54,11 +53,11 @@ module.exports = {
     },
     kovan: {
       chainId: 42,
-      url: `https://eth-kovan.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      url: `https://kovan.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [`${KOVAN_PRIVATE_KEY}`]
     },
     ropsten: {
-      url: `https://eth-ropsten.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+      url: `https://ropsten.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [`${KOVAN_PRIVATE_KEY}`]
     },
     bsctestnet: {
@@ -73,6 +72,8 @@ module.exports = {
     }
   },
   etherscan: {
-    apiKey: `${ETHERSCAN_KEY}`
+    apiKey: {
+      kovan: ETHERSCAN_KEY,
+    }
   }
 };
