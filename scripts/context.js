@@ -11,7 +11,7 @@ async function verifyContract(name, contractAddress, ...args) {
             constructorArguments: args,
         });
     } catch (error) {
-        console.log("❌ Verified Error, Please check on scan.");
+        console.log("❌ Verified Error, Please check on scan.", error);
     };
 }
 

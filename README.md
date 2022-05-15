@@ -26,3 +26,9 @@ npx hardhat compile
 ```
 npx hardhat run scripts/script_name.js --network network
 ```
+
+## console
+
+```
+npx hardhat console --network network
+```

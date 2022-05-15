@@ -14,12 +14,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 });
 
 
-const DEFAULT_NETWORK = "hardhat";
-const KOVAN_PRIVATE_KEY = process.env.KOVAN_PRIVATE_KEY || "";
-const BSCTEST_PRIVATE_KEY = process.env.BSCTEST_PRIVATE_KEY || "";
-const BSCMAIN_PRIVATE_KEY = process.env.BSCMAIN_PRIVATE_KEY || "";
-const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY || "";
-
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
@@ -40,7 +34,7 @@ module.exports = {
   mocha: {
     timeout: 20000,
   },
-  defaultNetwork: DEFAULT_NETWORK,
+  defaultNetwork: "hardhat",
   networks: {
     localhost: {
       accounts: 'remote',
@@ -54,26 +48,27 @@ module.exports = {
     kovan: {
       chainId: 42,
       url: `https://kovan.infura.io/v3/${process.env.INFURA_KEY}`,
-      accounts: [`${KOVAN_PRIVATE_KEY}`]
+      accounts: [process.env.KOVAN_PRIVATE_KEY]
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_KEY}`,
-      accounts: [`${KOVAN_PRIVATE_KEY}`]
+      accounts: [process.env.KOVAN_PRIVATE_KEY]
     },
     bsctestnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
-      accounts: [`${BSCTEST_PRIVATE_KEY}`]
+      accounts: [process.env.BSCTEST_PRIVATE_KEY]
     },
     bscmainnet: {
       url: "https://bsc-dataseed.binance.org/",
       chainId: 56,
-      accounts: [`${BSCMAIN_PRIVATE_KEY}`]
+      accounts: [process.env.BSCMAIN_PRIVATE_KEY]
     }
   },
   etherscan: {
     apiKey: {
-      kovan: ETHERSCAN_KEY,
+      kovan: process.env.ETHERSCAN_KEY,
+      bsc: process.env.BSCSCAN_KEY,
     }
   }
 };
