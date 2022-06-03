@@ -7,3 +7,4 @@ contracts/.DS_Store
 artifacts/
 cache/
 .env*
+config.js

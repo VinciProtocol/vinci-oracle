@@ -1,0 +1,20 @@
+module.exports = {
+    hardhat: {},
+    localhost: {
+        // https://docs.chain.link/docs/link-token-contracts/
+        link: '0x28a8746e75304c0780E011BEd21C72cD78cd535E',
+        nodes: {
+            //https://docs.chain.link/docs/make-a-http-get-request/
+            //https://market.link
+            BAYC: {
+                oracle: '0x000000000000000000000000000',
+                jobid: 'c51a',
+                fee: 0.01,
+                url: 'https://api.opensea.io/api/v1/collection/boredapeyachtclub/stats',
+                path: 'stats.floor_price',
+                description: 'BAYC floor price',
+                timeinterval: 3600,
+            },
+        },
+    },
+}

@@ -3,23 +3,12 @@ require("@nomiclabs/hardhat-etherscan");
 const dotenv = require('dotenv');
 dotenv.config();
 
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
+require('./tasks/set-DRE');
+require('./tasks/accounts');
+require('./tasks/deploy_client');
+require('./tasks/deploy_collector');
+require('./tasks/deploy_aggregator');
 
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
-
-/**
- * @type import('hardhat/config').HardhatUserConfig
- */
 module.exports = {
   typechain: {
     outDir: 'types',

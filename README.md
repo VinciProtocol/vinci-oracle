@@ -14,6 +14,8 @@ $ npm i        # Install dependencies
 
 Create a copy of the file `env.tmpl`, and name it `.env`.
 
+Create a copy of the file `config.js.tmpl`, and name it `config.js`.
+
 
 ## Compile
 
@@ -24,7 +26,9 @@ npx hardhat compile
 ## Deployment
 
 ```
-npx hardhat run scripts/script_name.js --network network
+npx hardhat deploy:client --network localhost
+npx hardhat deploy:collector --network localhost --nft BAYC
+npx hardhat deploy:aggregator --network localhost --nft BAYC
 ```
 
 ## console
