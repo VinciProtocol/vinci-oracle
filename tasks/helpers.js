@@ -1,5 +1,6 @@
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
+const Config = require('../config');
 
 let DRE;
 
@@ -18,20 +19,27 @@ function getDB() {
 };
 
 
-exports.getAddress = async (name) => {
-    return await getDB().get(
-        `${name}.${DRE.network.name}.address`,
-    ).value();
-};
-
-
-exports.saveContract = async (name, contract, nftName = undefined) => {
+function getKey(name, nftName = undefined) {
     let key;
     if (nftName) {
         key = `${name}.${nftName}.${DRE.network.name}`;
     } else {
         key = `${name}.${DRE.network.name}`;
-    }
+    };
+    return key;
+}
+
+
+exports.getAddress = async (name, nftName = undefined) => {
+    const key = getKey(name, nftName);
+    return await getDB().get(
+        `${key}.address`,
+    ).value();
+};
+
+
+exports.saveContract = async (name, contract, nftName = undefined) => {
+    const key = getKey(name, nftName);
     await getDB().set(
         key,
         {
@@ -42,26 +50,38 @@ exports.saveContract = async (name, contract, nftName = undefined) => {
 };
 
 
+exports.getNFTConfig = (nftName) => {
+    try {
+        return Config[DRE.network.name].nodes[nft];
+    } catch (error) {
+        console.error(`NFT: ${nft} must be provided in config[${DRE.network.name}].nodes`);
+        process.exit(1);
+    };
+};
+
+
+exports.waitTx = async (tx) => {
+    console.log('🍵 TransactionHash:', tx.hash);
+    const res = await tx.wait(1);
+    console.log('✅ gasUsed', res.gasUsed.toString());
+    return res;
+};
+
+
 exports.getSigner = async (index = 0 ) => {
     const accounts = await DRE.ethers.getSigners();
     return accounts[index];
 };
 
 
-exports.getContract = async (name, addr = undefined) => {
-    const address = addr || (await this.getAddress(name));
+exports.getContract = async (name, nftName = undefined, addr = undefined) => {
+    const address = addr || (await this.getAddress(name, nftName));
 
     if (!address) {
         return null;
     }
     console.log(`Get ${name} Contract at ${address}`);
     return await DRE.ethers.getContractAt(name, address);
-};
-
-
-exports.getContractByNFT = async (name, nftName) => {
-    const addr = await this.getAddress(`${name}.${nftName}`);
-    return await this.getContract(name, addr);
 };
 
 
@@ -79,11 +99,26 @@ exports.verifyContract = async (name, contractAddress, ...args) => {
 };
 
 
+exports.getTxConfig = () => {
+    let txConfig = {}
+    if (process.env.maxPriorityFeePerGas && process.env.maxFeePerGas && process.env.gasLimit) {
+        txConfig = {
+            maxPriorityFeePerGas: process.env.maxPriorityFeePerGas,
+            maxFeePerGas: process.env.maxFeePerGas,
+            gasLimit: process.env.gasLimit,
+        }
+        console.log('👉 Get Config:', txConfig);
+    };
+    return txConfig;
+};
+
+
 exports.deployContract = async (name, args, verify = false, nftName = undefined) => {
     console.log(`Deploying ${name} contract...`);
     const Contract = await DRE.ethers.getContractFactory(name);
-    const contract = await Contract.deploy(...args);
-    await contract.deployed();
+    const txConfig = this.getTxConfig();
+    const contract = await Contract.deploy(...args, txConfig);
+    await contract.deployed()
 
     console.log(`✅  Deployed ${name} at`, contract.address);
 

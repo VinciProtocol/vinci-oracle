@@ -5,9 +5,9 @@ dotenv.config();
 
 require('./tasks/set-DRE');
 require('./tasks/accounts');
-require('./tasks/deploy_client');
-require('./tasks/deploy_collector');
-require('./tasks/deploy_aggregator');
+require('./tasks/1_deploy_client');
+require('./tasks/2_deploy_collector');
+require('./tasks/3_deploy_aggregator');
 
 module.exports = {
   typechain: {
@@ -39,9 +39,10 @@ module.exports = {
       url: `https://kovan.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [process.env.KOVAN_PRIVATE_KEY]
     },
-    ropsten: {
-      url: `https://ropsten.infura.io/v3/${process.env.INFURA_KEY}`,
-      accounts: [process.env.KOVAN_PRIVATE_KEY]
+    mainnet: {
+      chainId: 1,
+      url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
+      accounts: [process.env.MAINNET_PRIVATE_KEY]
     },
     bsctestnet: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
@@ -58,6 +59,7 @@ module.exports = {
     apiKey: {
       kovan: process.env.ETHERSCAN_KEY,
       bsc: process.env.BSCSCAN_KEY,
+      mainnet: process.env.ETHERSCAN_KEY,
     }
   }
 };
