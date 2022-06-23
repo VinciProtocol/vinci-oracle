@@ -45,7 +45,7 @@ task("deploy:collector", "Deploy CollectPriceCumulative")
 
 task("deploy:collector:set-node", "set not CollectPriceCumulative")
  .addParam('nft', 'Price for this NFT')
- .setAction(async ({ verify, nft }, hre) => {
+ .setAction(async ({ nft }, hre) => {
     await hre.run('set-DRE');
 
     const nftConfig = getNFTConfig(nft);
@@ -79,10 +79,10 @@ task("deploy:collector:set-node", "set not CollectPriceCumulative")
 
 task("deploy:collector:transfer-right", "CollectPriceCumulative.transferOperationRight")
  .addParam('nft', 'Price for this NFT')
- .setAction(async ({ verify, nft }, hre) => {
+ .setAction(async ({ nft }, hre) => {
     await hre.run('set-DRE');
 
-    const nftConfig = getNFTConfig(nft);
+    getNFTConfig(nft);  // for verify nft
 
     const client = await getContract('VinciChainlinkClient');
     const collector = await getContract('VinciCollectPriceCumulative', nft);

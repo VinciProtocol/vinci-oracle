@@ -45,7 +45,7 @@ task("deploy:aggregator", "Deploy CollectAggregator")
 
 task("deploy:aggregator:set-collector", "CollectAggregator.setCollector")
  .addParam('nft', 'Aggregator for this NFT')
- .setAction(async ({ verify, nft }, hre) => {
+ .setAction(async ({ nft }, hre) => {
     await hre.run('set-DRE');
 
     const nftConfig = getNFTConfig(nft);

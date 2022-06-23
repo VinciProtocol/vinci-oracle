@@ -8,3 +8,4 @@ artifacts/
 cache/
 .env*
 config.js
+deployed-contracts.json
