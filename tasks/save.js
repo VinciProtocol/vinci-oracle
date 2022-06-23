@@ -4,6 +4,7 @@ const {
 const Config = require('../config');
 const {
     saveContract,
+    getContract,
     getNFTConfig,
 } = require('./helpers');
 
@@ -13,27 +14,30 @@ task("save:client", "Save ChainlinkClient")
  .setAction(async ({ address }, hre) => {
     await hre.run('set-DRE');
 
-    await saveContract('VinciChainlinkClient', address);
+    const contract = await getContract('VinciChainlinkClient', null, address);
+    await saveContract('VinciChainlinkClient', contract);
 });
 
 
 task("save:aggregator", "Save VinciCollectAggregator")
  .addParam('address', 'address')
  .addParam('nft', 'Aggregator for this NFT')
- .setAction(async ({ address }, hre) => {
+ .setAction(async ({ address, nft }, hre) => {
     await hre.run('set-DRE');
     const nftConfig = getNFTConfig(nft);
 
-    await saveContract('VinciCollectAggregator', address);
+    const contract = await getContract('VinciCollectAggregator', nft, address);
+    await saveContract('VinciCollectAggregator', contract, nft);
 });
 
 
 task("save:collector", "Save VinciCollectPriceCumulative")
  .addParam('address', 'address')
  .addParam('nft', 'Collector for this NFT')
- .setAction(async ({ address }, hre) => {
+ .setAction(async ({ address, nft }, hre) => {
     await hre.run('set-DRE');
     const nftConfig = getNFTConfig(nft);
 
-    await saveContract('VinciCollectPriceCumulative', address);
+    const contract = await getContract('VinciCollectPriceCumulative', nft, address);
+    await saveContract('VinciCollectPriceCumulative', contract, nft);
 });

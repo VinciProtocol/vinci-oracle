@@ -10,6 +10,7 @@ const {
     getNFTConfig,
     waitTx,
     getTxConfig,
+    verifyContract,
 } = require('./helpers');
 
 task("deploy:collector", "Deploy CollectPriceCumulative")
@@ -20,20 +21,24 @@ task("deploy:collector", "Deploy CollectPriceCumulative")
 
     const nftConfig = getNFTConfig(nft);
 
-    let contract = await getContract('VinciCollectPriceCumulative', nft);
+    const args = [
+        0,                                          // timeout
+        0,                                          // minSubmissionValue
+        BigInt('99999999999999999999999999999999'), // maxSubmissionValue
+        18,                                         // decimals
+        nftConfig.description,                      // description
+    ];
+
+    const contract = await getContract('VinciCollectPriceCumulative', nft);
     if (!contract) {
         await deployContract(
             'VinciCollectPriceCumulative',
-            [
-                0,                                          // timeout
-                0,                                          // minSubmissionValue
-                BigInt('99999999999999999999999999999999'), // maxSubmissionValue
-                18,                                         // decimals
-                nftConfig.description,                      // description
-            ],
+            args,
             verify,
             nft,
         );
+    } else if (verify) {
+        await verifyContract('VinciCollectPriceCumulative', contract.address, ...args)
     };
 });
 

@@ -44,7 +44,6 @@ exports.saveContract = async (name, contract, nftName = undefined) => {
         key,
         {
             address: contract.address,
-            deployer: contract.deployTransaction.from,
         },
     ).write();
 };
@@ -52,9 +51,9 @@ exports.saveContract = async (name, contract, nftName = undefined) => {
 
 exports.getNFTConfig = (nftName) => {
     try {
-        return Config[DRE.network.name].nodes[nft];
+        return Config[DRE.network.name].nodes[nftName];
     } catch (error) {
-        console.error(`NFT: ${nft} must be provided in config[${DRE.network.name}].nodes`);
+        console.error(`NFT: ${nftName} must be provided in config[${DRE.network.name}].nodes`);
         process.exit(1);
     };
 };

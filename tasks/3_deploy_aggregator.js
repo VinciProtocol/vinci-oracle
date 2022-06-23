@@ -8,6 +8,7 @@ const {
     getContract,
     getTxConfig,
     getNFTConfig,
+    verifyContract,
     waitTx,
 } = require('./helpers');
 
@@ -19,21 +20,25 @@ task("deploy:aggregator", "Deploy CollectAggregator")
     await hre.run('set-DRE');
 
     const nftConfig = getNFTConfig(nft);
+    const args = [
+        0,                                          // timeout
+        0,                                          // minSubmissionValue
+        BigInt('99999999999999999999999999999999'), // maxSubmissionValue
+        18,                                         // decimals
+        nftConfig.timeinterval,                   // timeInterval
+        nftConfig.description,                    // description
+    ];
+
     let contract = await getContract('VinciCollectAggregator', nft);
     if (!contract) {
         await deployContract(
             'VinciCollectAggregator',
-            [
-                0,                                          // timeout
-                0,                                          // minSubmissionValue
-                BigInt('99999999999999999999999999999999'), // maxSubmissionValue
-                18,                                         // decimals
-                nftConfig.timeinterval,                   // timeInterval
-                nftConfig.description,                    // description
-            ],
+            args,
             verify,
             nft,
         );
+    } else if (verify) {
+        await verifyContract('VinciCollectAggregator', contract.address, ...args)
     };
 });
 

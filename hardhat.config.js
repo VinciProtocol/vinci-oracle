@@ -5,6 +5,8 @@ dotenv.config();
 
 require('./tasks/set-DRE');
 require('./tasks/accounts');
+require('./tasks/save');
+require('./tasks/full');
 require('./tasks/1_deploy_client');
 require('./tasks/2_deploy_collector');
 require('./tasks/3_deploy_aggregator');
