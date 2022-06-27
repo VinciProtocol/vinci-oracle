@@ -41,6 +41,11 @@ module.exports = {
       url: `https://kovan.infura.io/v3/${process.env.INFURA_KEY}`,
       accounts: [process.env.KOVAN_PRIVATE_KEY]
     },
+    rinkeby: {
+      chainId: 4,
+      url: `https://rinkeby.infura.io/v3/${process.env.INFURA_KEY}`,
+      accounts: [process.env.RINKEBY_PRIVATE_KEY]
+    },
     mainnet: {
       chainId: 1,
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
@@ -62,6 +67,7 @@ module.exports = {
       kovan: process.env.ETHERSCAN_KEY,
       bsc: process.env.BSCSCAN_KEY,
       mainnet: process.env.ETHERSCAN_KEY,
+      rinkeby: process.env.ETHERSCAN_KEY,
     }
   }
 };
